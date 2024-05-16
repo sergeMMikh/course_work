@@ -1,8 +1,8 @@
 resource "aws_instance" "test_ubuntu_nginx" {
     count = 1
     ami = "ami-099b7bab1b9843525" # Amazon Linux AMI
-    instance_type = "t4g.micro"
-    # instance_type = "t4g.medium" # Usefull for Crystall project
+    # instance_type = "t4g.micro"
+    instance_type = "t4g.medium" # Usefull for Crystall project
 
     key_name      = "mikhalev@DEM-PC1048"
     # key_name      = aws_key_pair.pc1048_ssh.key_name
