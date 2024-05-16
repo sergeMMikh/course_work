@@ -1,3 +1,4 @@
+
 resource "aws_instance" "test_ubuntu_nginx" {
     count           = 2
     ami             = "ami-099b7bab1b9843525" # Amazon Linux AMI
@@ -9,13 +10,29 @@ resource "aws_instance" "test_ubuntu_nginx" {
         aws_security_group.crystall_sg.id
     ]
     
-    user_data       = file("userdata.tpl")
+    user_data       = templatefile("userdata.tpl",
+    {
+        project_name    = "Course Work. ",
+        description     = "description",
+        owner           = "SMMikh"
+    })
+
+    
 
     tags = {
-      Name = "test_ubuntu"
+      Name = "Backend"
       Owner = "SMMikh"
-      Project = "Crystall"
+      Project = "Course Work. DevOps Engineer."
     }
+
+    lifecycle {    
+        create_before_destroy = true  
+    }
+}
+
+resource "aws_eip" "my_static_ip" {
+    count    = 2
+    instance = aws_instance.test_ubuntu_nginx[count.index].id
 }
 
 ## This can be used for generating a new key pair.
@@ -25,36 +42,27 @@ resource "aws_instance" "test_ubuntu_nginx" {
 # }
 
 
+
 # Security group
 resource "aws_security_group" "crystall_sg" {
-  name        = "Crystall server Sequrity Group"
+  name        = "Web Server Sequrity Group"
   description = "allow ssh on 22 & http on port 80 & backend on 8001 && frontend on 8080"
 
 ## This is an internal network identification. It is not needed for now.
+## Without this part, AWS uses a default internal network.
 #   vpc_id      = aws_default_vpc.default.id 
    
   # Incoming trafic
-  ingress {
-    from_port        = 22
-    to_port          = 22
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
+  dynamic "ingress"{
+    for_each = ["80", "443", "22"]
+    content {
+        from_port        = ingress.value
+        to_port          = ingress.value
+        protocol         = "tcp"
+        cidr_blocks      = ["0.0.0.0/0"]
+    }
   }
  
-  ingress {
-    from_port        = 80
-    to_port          = 80
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port        = 443
-    to_port          = 443
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
-  }
-
   # Out trafic
   egress {
     from_port        = 0
@@ -62,5 +70,11 @@ resource "aws_security_group" "crystall_sg" {
     protocol         = "-1"
     cidr_blocks      = ["0.0.0.0/0"]
   }
+
+  tags = {
+      Name = "Web Server Sequrity Group"
+      Owner = "SMMikh"
+      Project = "Course Work. DevOps Engineer."
+    }
 }
 
