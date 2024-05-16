@@ -1,17 +1,15 @@
 resource "aws_instance" "test_ubuntu_nginx" {
-    count = 1
-    ami = "ami-099b7bab1b9843525" # Amazon Linux AMI
-    # instance_type = "t4g.micro"
-    instance_type = "t4g.medium" # Usefull for Crystall project
-
-    key_name      = "mikhalev@DEM-PC1048"
-    # key_name      = aws_key_pair.pc1048_ssh.key_name
+    count           = 2
+    ami             = "ami-099b7bab1b9843525" # Amazon Linux AMI
+    instance_type   = "t4g.micro"
+    
+    key_name        = "mikhalev@DEM-PC1048"
 
     vpc_security_group_ids = [
         aws_security_group.crystall_sg.id
     ]
     
-    # user_data              = file("userdata.tpl")
+    user_data       = file("userdata.tpl")
 
     tags = {
       Name = "test_ubuntu"
@@ -20,6 +18,7 @@ resource "aws_instance" "test_ubuntu_nginx" {
     }
 }
 
+## This can be used for generating a new key pair.
 # resource "aws_key_pair" "pc1048_ssh" {
 #     key_name = "mikhalev@DEM-PC1048"
 #     public_key = file("C:/Users/mikhalev/.ssh/id_ed25519.pub")
@@ -30,7 +29,9 @@ resource "aws_instance" "test_ubuntu_nginx" {
 resource "aws_security_group" "crystall_sg" {
   name        = "Crystall server Sequrity Group"
   description = "allow ssh on 22 & http on port 80 & backend on 8001 && frontend on 8080"
-#   vpc_id      = aws_default_vpc.default.id # Don't need now
+
+## This is an internal network identification. It is not needed for now.
+#   vpc_id      = aws_default_vpc.default.id 
    
   # Incoming trafic
   ingress {
@@ -48,15 +49,8 @@ resource "aws_security_group" "crystall_sg" {
   }
 
   ingress {
-    from_port        = 8001
-    to_port          = 8001
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port        = 8080
-    to_port          = 8080
+    from_port        = 443
+    to_port          = 443
     protocol         = "tcp"
     cidr_blocks      = ["0.0.0.0/0"]
   }
