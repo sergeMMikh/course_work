@@ -107,7 +107,7 @@ resource "aws_instance" "Kibana_srv" {
     }
 }
 
-resource "aws_instance" "BAstion_srv" {
+resource "aws_instance" "Bastion_srv" {
     count           = 1
     ami             = "ami-099b7bab1b9843525" # Amazon Linux AMI
     instance_type   = "t4g.micro"
