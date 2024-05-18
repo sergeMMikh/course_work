@@ -1,5 +1,5 @@
 
-resource "aws_instance" "test_ubuntu_nginx" {
+resource "aws_instance" "nginx_srv" {
     count           = 2
     ami             = "ami-099b7bab1b9843525" # Amazon Linux AMI
     instance_type   = "t4g.micro"
@@ -7,7 +7,7 @@ resource "aws_instance" "test_ubuntu_nginx" {
     key_name        = "mikhalev@DEM-PC1048"
 
     vpc_security_group_ids = [
-        aws_security_group.crystall_sg.id
+        aws_security_group.external_net.id
     ]
     
     user_data       = templatefile("userdata.tpl",
@@ -29,9 +29,121 @@ resource "aws_instance" "test_ubuntu_nginx" {
     }
 }
 
-resource "aws_eip" "my_static_ip" {
+resource "aws_instance" "Zabbix_srv" {
+    count           = 1
+    ami             = "ami-099b7bab1b9843525" # Amazon Linux AMI
+    instance_type   = "t4g.micro"
+    
+    key_name        = "mikhalev@DEM-PC1048"
+
+    vpc_security_group_ids = [
+        aws_security_group.external_net.id
+    ]
+    
+    user_data       = templatefile("userdata_zabbix.tpl",
+    {})    
+
+    tags = {
+      Name = "Zabbix"
+      Owner = "SMMikh"
+      Project = "Course Work. DevOps Engineer."
+    }
+
+    lifecycle {    
+        create_before_destroy = true  
+        ignore_changes = [user_data]
+    }
+}
+
+resource "aws_instance" "Elasticsearch_srv" {
+    count           = 1
+    ami             = "ami-099b7bab1b9843525" # Amazon Linux AMI
+    instance_type   = "t4g.micro"
+    
+    key_name        = "mikhalev@DEM-PC1048"
+
+    vpc_security_group_ids = [
+        aws_security_group.external_net.id
+    ]
+    
+    user_data       = templatefile("userdata_elasticsearch.tpl",
+    {})    
+
+    tags = {
+      Name = "Elasticsearch"
+      Owner = "SMMikh"
+      Project = "Course Work. DevOps Engineer."
+    }
+
+    lifecycle {    
+        create_before_destroy = true  
+        ignore_changes = [user_data]
+    }
+}
+
+resource "aws_instance" "Kibana_srv" {
+    count           = 1
+    ami             = "ami-099b7bab1b9843525" # Amazon Linux AMI
+    instance_type   = "t4g.micro"
+    
+    key_name        = "mikhalev@DEM-PC1048"
+
+    vpc_security_group_ids = [
+        aws_security_group.external_net.id
+    ]
+    
+    user_data       = templatefile("userdata_kibana.tpl",
+    {})    
+
+    tags = {
+      Name = "Kibana"
+      Owner = "SMMikh"
+      Project = "Course Work. DevOps Engineer."
+    }
+
+    lifecycle {    
+        create_before_destroy = true  
+        ignore_changes = [user_data]
+    }
+}
+
+resource "aws_instance" "BAstion_srv" {
+    count           = 1
+    ami             = "ami-099b7bab1b9843525" # Amazon Linux AMI
+    instance_type   = "t4g.micro"
+    
+    key_name        = "mikhalev@DEM-PC1048"
+
+    vpc_security_group_ids = [
+        aws_security_group.external_net.id
+    ]
+    
+    user_data       = templatefile("userdata_bastion.tpl",
+    {})    
+
+    tags = {
+      Name = "BAstion"
+      Owner = "SMMikh"
+      Project = "Course Work. DevOps Engineer."
+    }
+
+    lifecycle {    
+        create_before_destroy = true  
+        ignore_changes = [user_data]
+    }
+
+    depends_on = [
+        aws_instance.nginx_srv,
+        aws_instance.Zabbix_srv,
+        aws_instance.Elasticsearch_srv,
+        aws_instance.Kibana_srv
+    ]
+}
+
+# Elastic IP
+resource "aws_eip" "base_static_ip" {
     count    = 2
-    instance = aws_instance.test_ubuntu_nginx[count.index].id
+    instance = aws_instance.nginx_srv[count.index].id
 }
 
 ## This can be used for generating a new key pair.
@@ -39,41 +151,3 @@ resource "aws_eip" "my_static_ip" {
 #     key_name = "mikhalev@DEM-PC1048"
 #     public_key = file("C:/Users/mikhalev/.ssh/id_ed25519.pub")
 # }
-
-
-
-# Security group
-resource "aws_security_group" "crystall_sg" {
-  name        = "Web Server Sequrity Group"
-  description = "allow ssh on 22 & http on port 80 & backend on 8001 && frontend on 8080"
-
-## This is an internal network identification. It is not needed for now.
-## Without this part, AWS uses a default internal network.
-#   vpc_id      = aws_default_vpc.default.id 
-   
-  # Incoming trafic
-  dynamic "ingress"{
-    for_each = ["80", "443", "22"]
-    content {
-        from_port        = ingress.value
-        to_port          = ingress.value
-        protocol         = "tcp"
-        cidr_blocks      = ["0.0.0.0/0"]
-    }
-  }
- 
-  # Out trafic
-  egress {
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
-  }
-
-  tags = {
-      Name = "Web Server Sequrity Group"
-      Owner = "SMMikh"
-      Project = "Course Work. DevOps Engineer."
-    }
-}
-
