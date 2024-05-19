@@ -1,7 +1,17 @@
+# Get a latest ubuntu version in current region
+data "aws_ami" "latest_ubuntu"{
+    owners = ["099720109477"]
+    most_recent = true
+    filter {
+        name = "name"
+        values = ["ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-arm64-server-*"]
+    }
+}
 
 resource "aws_instance" "nginx_srv" {
     count           = 2
-    ami             = "ami-099b7bab1b9843525" # Amazon Linux AMI
+    # ami             = "ami-099b7bab1b9843525" # Amazon Linux AMI
+    ami             = data.aws_ami.latest_ubuntu.id
     instance_type   = "t4g.micro"
     
     key_name        = "mikhalev@DEM-PC1048"
@@ -31,7 +41,7 @@ resource "aws_instance" "nginx_srv" {
 
 resource "aws_instance" "Zabbix_srv" {
     count           = 1
-    ami             = "ami-099b7bab1b9843525" # Amazon Linux AMI
+    ami             = data.aws_ami.latest_ubuntu.id
     instance_type   = "t4g.micro"
     
     key_name        = "mikhalev@DEM-PC1048"
@@ -57,7 +67,7 @@ resource "aws_instance" "Zabbix_srv" {
 
 resource "aws_instance" "Elasticsearch_srv" {
     count           = 1
-    ami             = "ami-099b7bab1b9843525" # Amazon Linux AMI
+    ami             = data.aws_ami.latest_ubuntu.id
     instance_type   = "t4g.micro"
     
     key_name        = "mikhalev@DEM-PC1048"
@@ -83,7 +93,7 @@ resource "aws_instance" "Elasticsearch_srv" {
 
 resource "aws_instance" "Kibana_srv" {
     count           = 1
-    ami             = "ami-099b7bab1b9843525" # Amazon Linux AMI
+    ami             = data.aws_ami.latest_ubuntu.id
     instance_type   = "t4g.micro"
     
     key_name        = "mikhalev@DEM-PC1048"
@@ -109,7 +119,7 @@ resource "aws_instance" "Kibana_srv" {
 
 resource "aws_instance" "Bastion_srv" {
     count           = 1
-    ami             = "ami-099b7bab1b9843525" # Amazon Linux AMI
+    ami             = data.aws_ami.latest_ubuntu.id
     instance_type   = "t4g.micro"
     
     key_name        = "mikhalev@DEM-PC1048"
@@ -122,7 +132,7 @@ resource "aws_instance" "Bastion_srv" {
     {})    
 
     tags = {
-      Name = "BAstion"
+      Name = "Bastion"
       Owner = "SMMikh"
       Project = "Course Work. DevOps Engineer."
     }
