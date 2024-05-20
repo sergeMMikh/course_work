@@ -41,7 +41,9 @@ resource "aws_instance" "Zabbix_srv" {
   ]
 
   user_data = templatefile("userdata_zabbix.tpl",
-  {})
+    {
+      hostname = "zabbix_srv"
+  })
 
   tags = {
     Name    = "Zabbix"
