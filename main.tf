@@ -37,7 +37,7 @@ resource "aws_instance" "Zabbix_srv" {
   key_name = "mikhalev@DEM-PC1048"
 
   vpc_security_group_ids = [
-    aws_security_group.internal_net.id
+    aws_security_group.external_net.id
   ]
 
   user_data = templatefile("userdata_zabbix.tpl",
@@ -119,7 +119,13 @@ resource "aws_instance" "Bastion_srv" {
   ]
 
   user_data = templatefile("userdata_bastion.tpl",
-  {})
+    {
+      backend_1_private_ip         = aws_instance.nginx_srv[0].private_ip,
+      backend_2_private_ip         = aws_instance.nginx_srv[1].private_ip,
+      zabbix_srv_private_ip        = aws_instance.Zabbix_srv[0].private_ip,
+      elasticsearch_srv_private_ip = aws_instance.Elasticsearch_srv[0].private_ip,
+      kibana_srv_public_ip         = aws_instance.Kibana_srv[0].public_ip
+  })
 
   tags = {
     Name    = "Bastion"

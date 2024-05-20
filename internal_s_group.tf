@@ -1,6 +1,6 @@
 # Security group
 resource "aws_security_group" "internal_net" {
-  name        = "Web Server Sequrity Group"
+  name        = "Internal Sequrity Group"
   description = "allow ssh on 22 & http on port 80 & backend on 8001 && frontend on 8080"
 
   ## This is an internal network identification. It is not needed for now.
@@ -14,7 +14,7 @@ resource "aws_security_group" "internal_net" {
       from_port   = ingress.value
       to_port     = ingress.value
       protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
+      cidr_blocks = [data.aws_vpc.default.cidr_block]
     }
   }
 
