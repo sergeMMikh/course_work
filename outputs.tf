@@ -39,14 +39,14 @@ output "Bastion_srv_private_ip" {
 }
 
 ///_________________________________________________________________
-data "aws_autoscaling_group" "nginx" {
-  name = aws_autoscaling_group.cource-nginx.name
-}
+# data "aws_autoscaling_group" "nginx" {
+#   name = aws_autoscaling_group.cource-nginx.name
+# }
 
-data "aws_instance" "nginx_instances" {
-  for_each    = toset(data.aws_autoscaling_group.nginx.instances)
-  instance_id = each.value
-}
+# data "aws_instance" "nginx_instances" {
+#   for_each    = toset(data.aws_autoscaling_group.nginx.instances)
+#   instance_id = each.value
+# }
 
 
 #_________________________________________________________

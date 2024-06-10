@@ -1,5 +1,13 @@
-# e.g., Create subnets in the first two available availability zones
+# Get defoult VPC sidr-block
+data "aws_vpc" "default" {
+  default = true
+}
 
+data "aws_availability_zones" "av_zone" {
+}
+
+
+# e.g., Create subnets in the first two available availability zones
 resource "aws_default_subnet" "primary" {
   availability_zone = data.aws_availability_zones.av_zone.names[0]
 

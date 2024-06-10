@@ -5,7 +5,7 @@ resource "aws_security_group" "external_net" {
 
   ## This is an internal network identification. It is not needed for now.
   ## Without this part, AWS uses a default internal network.
-  #   vpc_id      = aws_default_vpc.default.id 
+  # vpc_id = aws_default_vpc.default.id
 
   # Incoming trafic
   dynamic "ingress" {

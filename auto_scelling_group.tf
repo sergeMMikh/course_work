@@ -12,6 +12,8 @@ resource "aws_autoscaling_group" "cource-nginx" {
   health_check_type = "ELB"
   load_balancers    = [aws_elb.server_load_balancer.name]
 
+  target_group_arns = []
+
   lifecycle {
     create_before_destroy = true
   }
@@ -30,4 +32,11 @@ resource "aws_autoscaling_group" "cource-nginx" {
   }
 }
 
-
+resource "aws_lb_target_group" "tg" {
+  name                 = "tf-example-lb-tg"
+  port                 = 80
+  protocol             = "HTTP"
+  target_type          = "ip"
+  vpc_id               = data.aws_vpc.default.id
+  deregistration_delay = 10
+}

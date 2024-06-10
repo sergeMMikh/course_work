@@ -8,10 +8,3 @@ data "aws_ami" "latest_ubuntu" {
   }
 }
 
-# Get defoult VPC sidr-block
-data "aws_vpc" "default" {
-  default = true
-}
-
-data "aws_availability_zones" "av_zone" {
-}
